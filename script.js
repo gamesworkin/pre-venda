@@ -77,9 +77,17 @@ dropZone.addEventListener('drop', (e) => {
 function verificarArquivo(file) {
     if (!file) return;
     
-    // Mantemos o limite de 1MB por segurança geral
+    // Se for PDF, o limite precisa ser rígido em 35KB para caber na célula do Sheets sem cortar
+    if (file.type === "application/pdf" && file.size > 35840) {
+        alert("⚠️ Para comprovantes em PDF, o arquivo deve ter no máximo 35KB.\n\nDica: Tire um print (foto) do comprovante e envie a imagem! Imagens são comprimidas automaticamente pelo nosso sistema.");
+        inputComprovante.value = "";
+        fileInfo.innerText = "Use uma imagem ou PDF de até 35KB";
+        return;
+    }
+    
+    // Limite geral para imagens (1MB)
     if (file.size > 1048576) {
-        alert("⚠️ Arquivo muito grande! O limite máximo permitido é 1MB.");
+        alert("⚠️ Imagem muito grande! O limite máximo permitido é 1MB.");
         inputComprovante.value = "";
         fileInfo.innerText = "Nenhum arquivo selecionado (Máx: 1MB)";
         return;
@@ -92,19 +100,16 @@ function verificarArquivo(file) {
 // ==========================================================================
 const otimizarEConvertreParaBase64 = (file) => {
     return new Promise((resolve, reject) => {
-        // Se for PDF, não dá para comprimir via Canvas (enviamos o base64 direto, mas limitado)
+        // Se for PDF, lê o arquivo original INTEIRO sem alterar nada
         if (file.type === "application/pdf") {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => {
-                // Corta metadados excessivos se houver e envia
-                resolve(reader.result);
-            };
+            reader.onload = () => resolve(reader.result);
             reader.onerror = (error) => reject(error);
             return;
         }
 
-        // Se for imagem (PNG/JPG), comprime dinamicamente usando um Canvas oculto
+        // Se for imagem, comprime dinamicamente
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = (event) => {
@@ -115,10 +120,8 @@ const otimizarEConvertreParaBase64 = (file) => {
                 let width = img.width;
                 let height = img.height;
 
-                // Redimensiona a imagem se ela for gigante (máximo 1000px de largura/altura)
-                // Mantém a proporção perfeita para o comprovante continuar legível
-                const MAX_WIDTH = 1000;
-                const MAX_HEIGHT = 1000;
+                const MAX_WIDTH = 900;
+                const MAX_HEIGHT = 900;
 
                 if (width > height) {
                     if (width > MAX_WIDTH) {
@@ -138,8 +141,8 @@ const otimizarEConvertreParaBase64 = (file) => {
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // Converte para JPEG com 60% de qualidade (reduz drasticamente o tamanho do texto)
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                // Reduzimos para 50% de qualidade para o texto ficar minúsculo e leve
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
                 resolve(dataUrl);
             };
         };
@@ -158,16 +161,19 @@ formComprovante.addEventListener('submit', async (e) => {
     }
 
     const btnEnviar = document.getElementById('btn-enviar-tudo');
-    btnEnviar.innerText = "COMPRIMINDO E ENVIANDO...";
+    btnEnviar.innerText = "PROCESSANDO E ENVIANDO...";
     btnEnviar.disabled = true;
 
     try {
-        // Roda o otimizador antes do envio
+        // Roda o otimizador
         const arquivoBase64Otimizado = await otimizarEConvertreParaBase64(arquivo);
         
-        // Corta para evitar que passe do limite máximo de caracteres de uma célula do Sheets (50k)
-        // Se o PDF for monstruoso, ele salva apenas o começo para evitar travar a planilha
-        const base64Final = arquivoBase64Otimizado.slice(0, 49000);
+        // REGRA DE SEGURANÇA CORRIGIDA:
+        // Se for imagem, garante que está na margem segura. Se for PDF, não corta nada (envia inteiro)!
+        let base64Final = arquivoBase64Otimizado;
+        if (arquivo.type !== "application/pdf") {
+            base64Final = arquivoBase64Otimizado.slice(0, 49000);
+        }
 
         const extensao = arquivo.name.split('.').pop();
         const nomeArquivoLimpo = `${dadosCliente.nome}_${dadosCliente.sobrenome}_${dadosCliente.cidade}`.replace(/\s+/g, '_').toLowerCase();
