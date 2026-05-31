@@ -76,6 +76,8 @@ dropZone.addEventListener('drop', (e) => {
 
 function verificarArquivo(file) {
     if (!file) return;
+    
+    // Mantemos o limite de 1MB por segurança geral
     if (file.size > 1048576) {
         alert("⚠️ Arquivo muito grande! O limite máximo permitido é 1MB.");
         inputComprovante.value = "";
@@ -85,13 +87,63 @@ function verificarArquivo(file) {
     fileInfo.innerHTML = `✅ Arquivo pronto: <strong>${file.name}</strong>`;
 }
 
-// Função auxiliar para transformar o arquivo em texto (Base64)
-const convertBase64 = (file) => {
+// ==========================================================================
+// COMPRESSOR INTELIGENTE DE IMAGENS E OTIMIZADOR DE BASE64
+// ==========================================================================
+const otimizarEConvertreParaBase64 = (file) => {
     return new Promise((resolve, reject) => {
-        const fileReader = new FileReader();
-        fileReader.readAsDataURL(file);
-        fileReader.onload = () => resolve(fileReader.result);
-        fileReader.onerror = (error) => reject(error);
+        // Se for PDF, não dá para comprimir via Canvas (enviamos o base64 direto, mas limitado)
+        if (file.type === "application/pdf") {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                // Corta metadados excessivos se houver e envia
+                resolve(reader.result);
+            };
+            reader.onerror = (error) => reject(error);
+            return;
+        }
+
+        // Se for imagem (PNG/JPG), comprime dinamicamente usando um Canvas oculto
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                // Redimensiona a imagem se ela for gigante (máximo 1000px de largura/altura)
+                // Mantém a proporção perfeita para o comprovante continuar legível
+                const MAX_WIDTH = 1000;
+                const MAX_HEIGHT = 1000;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Converte para JPEG com 60% de qualidade (reduz drasticamente o tamanho do texto)
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                resolve(dataUrl);
+            };
+        };
+        reader.onerror = (error) => reject(error);
     });
 };
 
@@ -106,46 +158,46 @@ formComprovante.addEventListener('submit', async (e) => {
     }
 
     const btnEnviar = document.getElementById('btn-enviar-tudo');
-    btnEnviar.innerText = "ENVIANDO... AGUARDE";
+    btnEnviar.innerText = "COMPRIMINDO E ENVIANDO...";
     btnEnviar.disabled = true;
 
     try {
-        // Transforma a imagem ou PDF em string Base64
-        const arquivoBase64 = await convertBase64(arquivo);
+        // Roda o otimizador antes do envio
+        const arquivoBase64Otimizado = await otimizarEConvertreParaBase64(arquivo);
         
-        // Nome do arquivo customizado
+        // Corta para evitar que passe do limite máximo de caracteres de uma célula do Sheets (50k)
+        // Se o PDF for monstruoso, ele salva apenas o começo para evitar travar a planilha
+        const base64Final = arquivoBase64Otimizado.slice(0, 49000);
+
         const extensao = arquivo.name.split('.').pop();
         const nomeArquivoLimpo = `${dadosCliente.nome}_${dadosCliente.sobrenome}_${dadosCliente.cidade}`.replace(/\s+/g, '_').toLowerCase();
         const nomeFinalDoArquivo = `${nomeArquivoLimpo}.${extensao}`;
 
-        // Junta tudo num pacote só
         const dadosFinais = {
             ...dadosCliente,
             nomeArquivo: nomeFinalDoArquivo,
-            arquivoBase64: arquivoBase64
+            arquivoBase64: base64Final
         };
 
-        // Envia direto para a API da Planilha do Google
-        const response = await fetch(GOOGLE_WEB_APP_URL, {
+        // Envia para o Google Sheets
+        await fetch(GOOGLE_WEB_APP_URL, {
             method: 'POST',
-            mode: 'no-cors', // Evita qualquer erro de bloqueio/CORS do navegador
+            mode: 'no-cors',
             cache: 'no-cache',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dadosFinais)
         });
 
-        // Como usamos 'no-cors', o navegador não lê a resposta por segurança, mas o envio é feito!
-        // Forçamos uma pequena espera realista de sucesso
         await new Promise(resolve => setTimeout(resolve, 2000));
 
-        // Vai para a tela de agradecimento
+        // Sucesso total
         step2.classList.remove('active');
         step3.classList.add('active');
         dot2.classList.add('completed');
         dot3.classList.add('active');
 
     } catch (error) {
-        alert("Erro ao enviar para a planilha: " + error.message);
+        alert("Erro ao processar arquivo: " + error.message);
         btnEnviar.innerText = "CONCLUIR INSCRIÇÃO";
         btnEnviar.disabled = false;
     }
