@@ -1,14 +1,14 @@
 // ==========================================================================
 // CONFIGURAÇÃO DO SUPABASE (Substitua pelos seus dados quando criar a conta)
 // ==========================================================================
-const SUPABASE_URL = "SUA_URL_DO_SUPABASE_AQUI";
-const SUPABASE_KEY = "SUA_CHAVE_ANON_DO_SUPABASE_AQUI";
+const SUPABASE_URL = "https://cifpnenninjittifbuub.supabase.co";
+const SUPABASE_KEY = "sb_publishable_iTll5TPd4ykpovYO-dIkpg_efJ5g9Yg";
 
 // Mudamos o nome aqui para evitar 100% de conflito com o script global
 let meuSupabaseClient = null;
 
 // Só tenta inicializar se as chaves forem alteradas pelo usuário
-if (SUPABASE_URL !== "SUA_URL_DO_SUPABASE_AQUI" && typeof supabase !== 'undefined') {
+if (SUPABASE_URL !== "Shttps://cifpnenninjittifbuub.supabase.co" && typeof supabase !== 'undefined') {
     meuSupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 }
 
