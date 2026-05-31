@@ -4,10 +4,12 @@
 const SUPABASE_URL = "SUA_URL_DO_SUPABASE_AQUI";
 const SUPABASE_KEY = "SUA_CHAVE_ANON_DO_SUPABASE_AQUI";
 
-// Inicializa o Supabase (Só ativa se você mudar as constantes acima)
-let supabase = null;
-if (SUPABASE_URL !== "SUA_URL_DO_SUPABASE_AQUI") {
-    supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Mudamos o nome aqui para evitar 100% de conflito com o script global
+let meuSupabaseClient = null;
+
+// Só tenta inicializar se as chaves forem alteradas pelo usuário
+if (SUPABASE_URL !== "SUA_URL_DO_SUPABASE_AQUI" && typeof supabase !== 'undefined') {
+    meuSupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 }
 
 // ==========================================================================
@@ -62,7 +64,7 @@ formCadastro.addEventListener('submit', (e) => {
     const cidade = document.getElementById('cidade').value.trim();
     const estado = document.getElementById('estado').value;
 
-    // Trava de segurança contra "engraçadinhos" que tentam burlar pelo inspecionar elemento
+    // Trava de segurança contra "engraçadinhos"
     if (!nome || !sobrenome || whatsapp.length < 14 || !cidade || !estado) {
         alert("⚠️ Por favor, preencha todos os campos corretamente!");
         return;
@@ -83,16 +85,12 @@ formCadastro.addEventListener('submit', (e) => {
 // ==========================================================================
 // GERENCIAMENTO DA ÁREA DE UPLOAD (DRAG & DROP E CLIQUE)
 // ==========================================================================
-
-// Abrir seletor de arquivos ao clicar na caixa
 dropZone.addEventListener('click', () => inputComprovante.click());
 
-// Atualizar o texto quando o usuário escolhe o arquivo
 inputComprovante.addEventListener('change', (e) => {
     verificarArquivo(e.target.files[0]);
 });
 
-// Efeitos visuais de arrastar o arquivo por cima da caixa
 ['dragenter', 'dragover'].forEach(eventName => {
     dropZone.addEventListener(eventName, (e) => {
         e.preventDefault();
@@ -107,27 +105,23 @@ inputComprovante.addEventListener('change', (e) => {
     }, false);
 });
 
-// Quando o usuário solta o arquivo na caixa
 dropZone.addEventListener('drop', (e) => {
     const dt = e.dataTransfer;
     const file = dt.files[0];
-    inputComprovante.files = dt.files; // Sincroniza o arquivo arrastado com o formulário
+    inputComprovante.files = dt.files;
     verificarArquivo(file);
 });
 
-// Função que valida o tamanho e o tipo do arquivo
 function verificarArquivo(file) {
     if (!file) return;
 
-    // Validar tamanho (1MB = 1048576 bytes)
     if (file.size > 1048576) {
         alert("⚠️ Arquivo muito grande! O limite máximo permitido é 1MB.");
-        inputComprovante.value = ""; // Limpa o arquivo
+        inputComprovante.value = "";
         fileInfo.innerText = "Nenhum arquivo selecionado (Máx: 1MB)";
         return;
     }
 
-    // Se passou na validação, mostra o nome do arquivo na tela
     fileInfo.innerHTML = `✅ Arquivo pronto: <strong>${file.name}</strong>`;
 }
 
@@ -139,7 +133,6 @@ formComprovante.addEventListener('submit', async (e) => {
 
     const arquivo = inputComprovante.files[0];
 
-    // Trava de segurança rigorosa
     if (!arquivo) {
         alert("⚠️ O envio do comprovante é obrigatório para continuar!");
         return;
@@ -149,28 +142,24 @@ formComprovante.addEventListener('submit', async (e) => {
     btnEnviar.innerText = "ENVIANDO... AGUARDE";
     btnEnviar.disabled = true;
 
-    // Gerar o nome do arquivo do jeito que você pediu: Nome_Sobrenome_Cidade.extensao
     const extensao = arquivo.name.split('.').pop();
     const nomeArquivoLimpo = `${dadosCliente.nome}_${dadosCliente.sobrenome}_${dadosCliente.cidade}`.replace(/\s+/g, '_').toLowerCase();
     const nomeFinalDoArquivo = `${nomeArquivoLimpo}.${extensao}`;
 
     // --- SE O SUPABASE ESTIVER CONFIGURADO ---
-    if (supabaseClient) {
+    if (meuSupabaseClient) {
         try {
-            // 1. Faz o Upload do Comprovante para o Storage do Supabase (Pasta 'comprovantes')
-            const { data: storageData, error: storageError } = await supabaseClient
+            const { data: storageData, error: storageError } = await meuSupabaseClient
                 .storage
                 .from('comprovantes')
                 .upload(nomeFinalDoArquivo, arquivo, { upsert: true });
 
             if (storageError) throw storageError;
 
-            // Pega o link público da imagem gerada no storage
-            const { data: urlData } = supabaseClient.storage.from('comprovantes').getPublicUrl(nomeFinalDoArquivo);
+            const { data: urlData } = meuSupabaseClient.storage.from('comprovantes').getPublicUrl(nomeFinalDoArquivo);
             const comprovanteUrl = urlData.publicUrl;
 
-            // 2. Insere os dados de Texto + o Link do Comprovante na Tabela 'clientes_pre_venda'
-            const { error: dbError } = await supabaseClient
+            const { error: dbError } = await meuSupabaseClient
                 .from('clientes_pre_venda')
                 .insert([
                     {
@@ -192,14 +181,11 @@ formComprovante.addEventListener('submit', async (e) => {
             return;
         }
     } else {
-        // --- MODO SIMULAÇÃO (Roda se você ainda não configurou o Supabase) ---
-        console.log("Modo Simulação Ativo! Dados que seriam salvos:", dadosCliente);
-        console.log("Nome do arquivo gerado para o sistema:", nomeFinalDoArquivo);
-        // Pequeno delay para fingir o envio e dar um toque realista
+        // --- MODO SIMULAÇÃO ---
+        console.log("Modo Simulação Ativo! Dados salvos na memória:", dadosCliente);
         await new Promise(resolve => setTimeout(resolve, 1500));
     }
 
-    // Finalização: Transição para a tela 3 (Agradecimento)
     step2.classList.remove('active');
     step3.classList.add('active');
 
