@@ -151,15 +151,14 @@ formComprovante.addEventListener('submit', async (e) => {
 
     // Gerar o nome do arquivo do jeito que você pediu: Nome_Sobrenome_Cidade.extensao
     const extensao = arquivo.name.split('.').pop();
-    // Limpa espaços e formata o nome do arquivo de forma segura
     const nomeArquivoLimpo = `${dadosCliente.nome}_${dadosCliente.sobrenome}_${dadosCliente.cidade}`.replace(/\s+/g, '_').toLowerCase();
     const nomeFinalDoArquivo = `${nomeArquivoLimpo}.${extensao}`;
 
     // --- SE O SUPABASE ESTIVER CONFIGURADO ---
-    if (supabase) {
+    if (supabaseClient) {
         try {
             // 1. Faz o Upload do Comprovante para o Storage do Supabase (Pasta 'comprovantes')
-            const { data: storageData, error: storageError } = await supabase
+            const { data: storageData, error: storageError } = await supabaseClient
                 .storage
                 .from('comprovantes')
                 .upload(nomeFinalDoArquivo, arquivo, { upsert: true });
@@ -167,11 +166,11 @@ formComprovante.addEventListener('submit', async (e) => {
             if (storageError) throw storageError;
 
             // Pega o link público da imagem gerada no storage
-            const { data: urlData } = supabase.storage.from('comprovantes').getPublicUrl(nomeFinalDoArquivo);
+            const { data: urlData } = supabaseClient.storage.from('comprovantes').getPublicUrl(nomeFinalDoArquivo);
             const comprovanteUrl = urlData.publicUrl;
 
             // 2. Insere os dados de Texto + o Link do Comprovante na Tabela 'clientes_pre_venda'
-            const { error: dbError } = await supabase
+            const { error: dbError } = await supabaseClient
                 .from('clientes_pre_venda')
                 .insert([
                     {
