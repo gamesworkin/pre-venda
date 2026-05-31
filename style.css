@@ -1,0 +1,357 @@
+/* ==========================================================================
+   CONFIGURAÇÕES GERAIS & PALETA DE CORES (VIBE GAMER PREMIUM)
+   ========================================================================== */
+:root {
+    --bg-principal: #0d0e12;       /* Fundo ultra dark moderno */
+    --bg-card: #161920;            /* Fundo dos formulários (Glassmorphism) */
+    --cor-neon: #00ff66;           /* Verde neon esportivo (Bomba Patch) */
+    --cor-neon-hover: #00cc52;     /* Verde mais escuro para o efeito de passar o mouse */
+    --texto-claro: #ffffff;        /* Texto principal */
+    --texto-escuro: #8a92a6;       /* Textos secundários e placeholders */
+    --borda-gamer: #262b36;        /* Bordas sutis dos inputs */
+    --fonte-gamer: 'Oxanium', sans-serif;
+    --fonte-padrao: 'Poppins', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-principal);
+    color: var(--texto-claro);
+    font-family: var(--fonte-padrao);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    /* Detalhe de fundo geométrico sutil estilo menu de jogo */
+    background-image: radial-gradient(circle at 10% 20%, rgba(0, 255, 102, 0.03) 0%, transparent 80%);
+}
+
+/* Container Principal Centralizado */
+.container {
+    background-color: var(--bg-card);
+    width: 100%;
+    max-width: 500px;
+    border-radius: 16px;
+    padding: 40px 30px;
+    border: 1px solid var(--borda-gamer);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Linha decorativa no topo do card */
+.container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--cor-neon), transparent);
+}
+
+/* ==========================================================================
+   CABEÇALHO (LOGO & SUBTÍTULO)
+   ========================================================================== */
+.header-game {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.logo {
+    font-family: var(--fonte-gamer);
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--texto-claro);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.logo span {
+    color: var(--cor-neon);
+    text-shadow: 0 0 15px rgba(0, 255, 102, 0.6);
+}
+
+.subtitle {
+    font-size: 0.75rem;
+    color: var(--texto-escuro);
+    letter-spacing: 1px;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+/* ==========================================================================
+   INDICADOR DE ETAPAS (PASSOS 1, 2, 3)
+   ========================================================================== */
+.steps-indicator {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding: 0 20px;
+}
+
+.step {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-color: #20242f;
+    border: 2px solid var(--borda-gamer);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--fonte-gamer);
+    font-weight: 600;
+    color: var(--texto-escuro);
+    transition: all 0.4s ease;
+}
+
+.step.active {
+    background-color: var(--bg-principal);
+    border-color: var(--cor-neon);
+    color: var(--cor-neon);
+    box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
+}
+
+.step.completed {
+    background-color: var(--cor-neon);
+    border-color: var(--cor-neon);
+    color: var(--bg-principal);
+}
+
+.step-line {
+    flex: 1;
+    height: 2px;
+    background-color: var(--borda-gamer);
+    margin: 0 10px;
+    transition: all 0.4s ease;
+}
+
+.step-line.active {
+    background-color: var(--cor-neon);
+}
+
+/* ==========================================================================
+   CONTROLADOR DE FLUXO (ESCONDER / MOSTRAR TELAS)
+   ========================================================================== */
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: block;
+    animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.section-title {
+    font-family: var(--fonte-gamer);
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+    border-left: 4px solid var(--cor-neon);
+    padding-left: 12px;
+}
+
+.text-center { text-align: center; }
+
+/* ==========================================================================
+   INPUTS E FORMULÁRIOS
+   ========================================================================== */
+.input-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-row {
+    display: flex;
+    gap: 15px;
+}
+
+label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--texto-escuro);
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+input[type="text"],
+input[type="tel"],
+select {
+    background-color: #1c202a;
+    border: 1px solid var(--borda-gamer);
+    padding: 14px 16px;
+    border-radius: 8px;
+    color: var(--texto-claro);
+    font-family: var(--fonte-padrao);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--cor-neon);
+    box-shadow: 0 0 10px rgba(0, 255, 102, 0.15);
+    background-color: #202532;
+}
+
+select {
+    cursor: pointer;
+    appearance: none; /* Esconde a seta padrão chata do navegador */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238a92a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px;
+}
+
+/* ==========================================================================
+   ÁREA DE UPLOAD (PASSO 2)
+   ========================================================================== */
+.step-description {
+    font-size: 0.85rem;
+    color: var(--texto-escuro);
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.step-description strong {
+    color: var(--texto-claro);
+}
+
+.upload-container {
+    border: 2px dashed var(--borda-gamer);
+    background-color: #1c202a;
+    padding: 40px 20px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 30px;
+}
+
+.upload-container:hover, .upload-container.dragover {
+    border-color: var(--cor-neon);
+    background-color: #202635;
+    box-shadow: 0 0 15px rgba(0, 255, 102, 0.05);
+}
+
+.upload-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.upload-container:hover .upload-icon {
+    transform: translateY(-5px);
+}
+
+.highlight {
+    color: var(--cor-neon);
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.file-info {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--texto-escuro);
+    margin-top: 10px;
+}
+
+/* ==========================================================================
+   BOTÃO PREMIUM (A STRELA DA PÁGINA)
+   ========================================================================== */
+.btn-premium {
+    width: 100%;
+    background-color: var(--cor-neon);
+    color: #000000;
+    border: none;
+    padding: 16px;
+    font-family: var(--fonte-gamer);
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(0, 255, 102, 0.3);
+}
+
+.btn-premium:hover {
+    background-color: var(--cor-neon-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 255, 102, 0.5);
+}
+
+.btn-premium:active {
+    transform: translateY(0);
+}
+
+/* ==========================================================================
+   TELA DE AGRADECIMENTO (PASSO 3)
+   ========================================================================== */
+.success-screen {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.success-icon {
+    width: 70px;
+    height: 70px;
+    background-color: rgba(0, 255, 102, 0.1);
+    border: 2px solid var(--cor-neon);
+    color: var(--cor-neon);
+    border-radius: 50%;
+    font-size: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 25px auto;
+    box-shadow: 0 0 20px rgba(0, 255, 102, 0.2);
+}
+
+.thanks-text {
+    font-size: 0.9rem;
+    color: var(--texto-escuro);
+    line-height: 1.7;
+    margin-bottom: 30px;
+}
+
+.thanks-text p {
+    margin-bottom: 15px;
+}
+
+/* Badge Estilo Painel de Jogo */
+.badge-gamer {
+    display: inline-block;
+    font-family: var(--fonte-gamer);
+    font-weight: 800;
+    font-size: 0.85rem;
+    background: linear-gradient(135deg, #1c202a, #262b36);
+    color: var(--cor-neon);
+    padding: 8px 20px;
+    border-radius: 50px;
+    border: 1px solid rgba(0, 255, 102, 0.3);
+    letter-spacing: 2px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bomba Patch - Pré-Venda Premium</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;800&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <div class="container">
+        <header class="header-game">
+            <div class="logo">BOMBA <span>PATCH</span></div>
+            <p class="subtitle">GARANTA JÁ SEU ACESSO EXCLUSIVO NA PRÉ-VENDA</p>
+        </header>
+
+        <div class="steps-indicator">
+            <div class="step active" id="step-dot-1">1</div>
+            <div class="step-line"></div>
+            <div class="step" id="step-dot-2">2</div>
+            <div class="step-line"></div>
+            <div class="step" id="step-dot-3">3</div>
+        </div>
+
+        <div class="form-step active" id="step-1">
+            <h2 class="section-title">Dados de Inscrição</h2>
+            <form id="form-cadastro" novalidate> <div class="input-group">
+                    <label for="nome">Nome</label>
+                    <input type="text" id="nome" placeholder="Digite seu nome" required autocomplete="off">
+                </div>
+
+                <div class="input-group">
+                    <label for="sobrenome">Sobrenome</label>
+                    <input type="text" id="sobrenome" placeholder="Digite seu sobrenome" required autocomplete="off">
+                </div>
+
+                <div class="input-group">
+                    <label for="whatsapp">WhatsApp (com DDD)</label>
+                    <input type="tel" id="whatsapp" placeholder="(XX) 9XXXX-XXXX" required autocomplete="off">
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group" style="flex: 2;">
+                        <label for="cidade">Cidade</label>
+                        <input type="text" id="cidade" placeholder="Sua cidade" required autocomplete="off">
+                    </div>
+                    <div class="input-group" style="flex: 1;">
+                        <label for="estado">Estado</label>
+                        <select id="estado" required>
+                            <option value="" disabled selected>UF</option>
+                            <option value="AC">AC</option>
+                            <option value="AL">AL</option>
+                            <option value="AP">AP</option>
+                            <option value="AM">AM</option>
+                            <option value="BA">BA</option>
+                            <option value="CE">CE</option>
+                            <option value="DF">DF</option>
+                            <option value="ES">ES</option>
+                            <option value="GO">GO</option>
+                            <option value="MA">MA</option>
+                            <option value="MT">MT</option>
+                            <option value="MS">MS</option>
+                            <option value="MG">MG</option>
+                            <option value="PA">PA</option>
+                            <option value="PB">PB</option>
+                            <option value="PR">PR</option>
+                            <option value="PE">PE</option>
+                            <option value="PI">PI</option>
+                            <option value="RJ">RJ</option>
+                            <option value="RN">RN</option>
+                            <option value="RS">RS</option>
+                            <option value="RO">RO</option>
+                            <option value="RR">RR</option>
+                            <option value="SC">SC</option>
+                            <option value="SP">SP</option>
+                            <option value="SE">SE</option>
+                            <option value="TO">TO</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-premium">
+                    CONTINUAR A PRÉ-VENDA
+                    <span class="btn-glow"></span>
+                </button>
+            </form>
+        </div>
+
+        <div class="form-step" id="step-2">
+            <h2 class="section-title">Enviar Comprovante</h2>
+            <p class="step-description">Para validar sua pré-venda, envie o comprovante de pagamento nos formatos <strong>PDF, JPG ou PNG</strong>.</p>
+            
+            <form id="form-comprovante" novalidate>
+                <div class="upload-container" id="drop-zone">
+                    <div class="upload-icon">📁</div>
+                    <p>Arraste o arquivo aqui ou <span class="highlight">clique para buscar</span></p>
+                    <span class="file-info" id="file-info">Nenhum arquivo selecionado (Máx: 1MB)</span>
+                    <input type="file" id="comprovante" accept=".pdf, .jpg, .jpeg, .png" required style="display: none;">
+                </div>
+
+                <button type="submit" class="btn-premium" id="btn-enviar-tudo">
+                    CONCLUIR INSCRIÇÃO
+                    <span class="btn-glow"></span>
+                </button>
+            </form>
+        </div>
+
+        <div class="form-step" id="step-3">
+            <div class="success-screen">
+                <div class="success-icon">✓</div>
+                <h2 class="section-title text-center">Inscrição Confirmada!</h2>
+                <div class="thanks-text">
+                    <p>Obrigado por participar da pré-venda do novo Bomba Patch!</p>
+                    <p>Seus dados e seu comprovante foram enviados com sucesso para o nosso sistema. Nossa equipe vai validar as informações e, em breve, você receberá todos os detalhes de acesso diretamente no seu WhatsApp.</p>
+                    <p>Prepare-se para jogar com a melhor e mais atualizada versão do futebol gamer!</p>
+                </div>
+                <div class="badge-gamer">100% ATUALIZADO</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
