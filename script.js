@@ -8,9 +8,9 @@ const SUPABASE_KEY = "sb_publishable_iTll5TPd4ykpovYO-dIkpg_efJ5g9Yg";
 let meuSupabaseClient = null;
 
 // Só tenta inicializar se as chaves forem alteradas pelo usuário
-if (SUPABASE_URL !== "https://cifpnenninjittifbuub.supabase.co" && typeof supabase !== 'undefined') {
-    meuSupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-}
+// Inicializa o Supabase direto com as suas chaves
+meuSupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 
 // ==========================================================================
 // SELEÇÃO DE ELEMENTOS DO HTML
